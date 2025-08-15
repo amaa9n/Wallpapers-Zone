@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ultra HD Wallpapers — Generate, Browse, Download</title>
+  <meta name="description" content="Browse beautiful 4K/5K wallpapers. Generate AI wallpapers with prompts. Download, like, review, and share." />
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="/assets/favicon.png" />
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"] },
+          colors: {
+            brand: {
+              50: '#eef2ff', 100:'#e0e7ff', 200:'#c7d2fe', 300:'#a5b4fc', 400:'#818cf8',
+              500:'#6366f1', 600:'#5857ee', 700:'#4f46e5', 800:'#4338ca', 900:'#3730a3'
+            }
+          }
+        }
+      },
+      darkMode: 'class'
+    }
+  </script>
+
+  <!-- Icons -->
+  <link href="https://unpkg.com/lucide-static@0.453.0/font/lucide.css" rel="stylesheet" />
+  <!-- GSAP for tasteful corporate animations -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <!-- Alpine.js for lightweight interactivity -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Day.js for time formatting -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+  <link rel="preconnect" href="https://i.pinimg.com" crossorigin>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+
+<body x-data="appState" :class="{ 'dark': darkMode }" class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+  <!-- Topbar -->
+  <header class="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-slate-900/70 bg-white/60 dark:bg-slate-900/60 border-b border-slate-200/50 dark:border-slate-700/50">
+    <div class="mx-auto max-w-7xl px-3 sm:px-6">
+      <div class="flex items-center gap-3 py-3">
+        <button @click="scrollToTop()" class="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
+          <i class="lucide-images"></i>
+          <span class="tracking-tight">Ultra HD Wallpapers</span>
+        </button>
+        <span class="ml-2 rounded-full bg-brand-100 dark:bg-brand-900/40 px-2 py-0.5 text-xs text-brand-700 dark:text-brand-200">PWA</span>
+        <div class="flex-1"></div>
+        <div class="hidden md:flex items-center gap-2">
+          <div class="relative group">
+            <input x-model.debounce.300ms="q" @input="search()" type="search" placeholder="Search wallpapers, tags..." class="w-72 rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-800/70 px-4 py-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"/>
+            <i class="lucide-search absolute left-2.5 top-2.5 text-slate-400"></i>
+          </div>
+          <button @click="openGenerator=true" class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-3 py-2 text-sm font-medium">Generate (AI)</button>
+          <button @click="toggleDark()" class="rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm" x-text="darkMode ? 'Light' : 'Dark'"></button>
+        </div>
+        <button class="md:hidden rounded-xl border border-slate-200 dark:border-slate-700 p-2" @click="mobileMenu=!mobileMenu"><i class="lucide-menu"></i></button>
+      </div>
+      <div x-show="mobileMenu" x-transition class="md:hidden pb-3">
+        <div class="flex items-center gap-2">
+          <input x-model.debounce.300ms="q" @input="search()" type="search" placeholder="Search wallpapers, tags..." class="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"/>
+          <button @click="openGenerator=true" class="rounded-xl bg-brand-600 text-white px-3 py-2 text-sm font-medium">AI</button>
+          <button @click="toggleDark()" class="rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm" x-text="darkMode ? 'Light' : 'Dark'"></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="mx-auto max-w-7xl px-3 sm:px-6 py-10 text-center">
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight"><span class="bg-gradient-to-r from-brand-400 via-brand-600 to-indigo-500 bg-clip-text text-transparent">4K / 5K Wallpapers</span> you’ll actually keep</h1>
+      <p class="mt-3 text-slate-600 dark:text-slate-300">Browse curated collections, search by tags, save favorites, leave reviews, and generate brand new AI wallpapers from prompts.</p>
+      <div class="mt-5 flex justify-center gap-2">
+        <button @click="openGenerator=true" class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 font-medium">Create with AI</button>
+        <a href="#wall-grid" class="rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-2">Explore</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="border-t border-slate-200/60 dark:border-slate-800/60">
+    <div class="mx-auto max-w-7xl px-3 sm:px-6 py-4 flex flex-wrap items-center gap-2">
+      <div class="text-sm text-slate-500">Filter:</div>
+      <template x-for="tag in featuredTags" :key="tag">
+        <button @click="toggleTag(tag)" class="rounded-full border px-3 py-1 text-sm" :class="activeTags.has(tag) ? 'bg-brand-600 border-brand-600 text-white' : 'border-slate-300 dark:border-slate-700'" x-text="tag"></button>
+      </template>
+      <div class="flex-1"></div>
+      <select x-model="sortBy" @change="applySort()" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-1.5 text-sm">
+        <option value="latest">Latest</option>
+        <option value="trending">Trending</option>
+        <option value="popular">Most Liked (local)</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Grid -->
+  <main id="wall-grid" class="mx-auto max-w-[95rem] px-2 sm:px-4">
+    <div id="grid" class="[column-fill:_balance] sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 2xl:columns-6 gap-4 py-6">
+      <!-- Items injected by JS -->
+    </div>
+    <div id="sentinel" class="h-10"></div>
+  </main>
+
+  <!-- Detail Modal -->
+  <div x-show="detailOpen" x-transition.opacity class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3" @keydown.escape.window="closeDetail()">
+    <div class="relative w-full max-w-5xl rounded-2xl bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
+      <button class="absolute right-2 top-2 z-10 rounded-full bg-white/70 dark:bg-slate-800/70 p-2" @click="closeDetail()"><i class="lucide-x"></i></button>
+      <div class="grid md:grid-cols-2 gap-0">
+        <div class="bg-slate-950/60 p-0">
+          <img :src="selected?.src" :alt="selected?.title" class="w-full h-full object-contain max-h-[80vh]" loading="eager"/>
+        </div>
+        <div class="p-4 sm:p-6 space-y-4">
+          <div>
+            <h3 class="text-xl font-semibold" x-text="selected?.title"></h3>
+            <p class="text-sm text-slate-500">Added <span x-text="formatDate(selected?.added)"></span> · <span x-text="selected?.resolution"></span></p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <template x-for="t in selected?.tags" :key="t">
+              <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-1 text-xs" x-text="t"></span>
+            </template>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button @click="download(selected)" class="rounded-xl bg-brand-600 text-white px-3 py-2 text-sm"><i class="lucide-download mr-1"></i>Download</button>
+            <button @click="toggleLike(selected)" class="rounded-xl border px-3 py-2 text-sm" :class="isLiked(selected?.id) ? 'border-brand-600 text-brand-700 dark:text-brand-300' : 'border-slate-300 dark:border-slate-700'"><i class="lucide-heart mr-1"></i><span x-text="likeLabel(selected)"></span></button>
+            <button @click="copy(selected?.src)" class="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm"><i class="lucide-link mr-1"></i>Copy Link</button>
+            <a :href="giscusLink(selected)" target="_blank" class="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm"><i class="lucide-message-square mr-1"></i>Open Reviews</a>
+          </div>
+          <p class="text-xs text-slate-500">* Downloads may open in a new tab if the image host blocks direct download (CORS).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Generator Modal -->
+  <div x-show="openGenerator" x-transition.opacity class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3" @keydown.escape.window="openGenerator=false">
+    <div class="relative w-full max-w-3xl rounded-2xl bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
+      <button class="absolute right-2 top-2 z-10 rounded-full bg-white/70 dark:bg-slate-800/70 p-2" @click="openGenerator=false"><i class="lucide-x"></i></button>
+      <div class="p-4 sm:p-6 space-y-4">
+        <h3 class="text-xl font-semibold">Generate AI Wallpaper</h3>
+        <div class="grid md:grid-cols-2 gap-3">
+          <textarea x-model="gen.prompt" placeholder="Describe your wallpaper (e.g., ‘neon city skyline at dusk, rain reflections, ultra-detailed, cinematic’)." class="min-h-[96px] rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2"></textarea>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <label class="flex flex-col">
+              <span class="text-slate-500">Aspect</span>
+              <select x-model="gen.aspect" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2">
+                <option value="1:1">1:1</option>
+                <option value="16:9" selected>16:9</option>
+                <option value="9:16">9:16</option>
+                <option value="21:9">21:9</option>
+              </select>
+            </label>
+            <label class="flex flex-col">
+              <span class="text-slate-500">Quality</span>
+              <select x-model="gen.quality" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2">
+                <option value="standard">Standard</option>
+                <option value="hd" selected>HD</option>
+              </select>
+            </label>
+            <label class="flex flex-col">
+              <span class="text-slate-500">Base Size</span>
+              <select x-model="gen.size" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2">
+                <option value="1024x1024">1024×1024</option>
+                <option value="2048x1152" selected>2048×1152</option>
+                <option value="2048x2048">2048×2048</option>
+              </select>
+            </label>
+            <label class="flex items-center gap-2 mt-6">
+              <input type="checkbox" x-model="gen.upscale5k" class="rounded"> Upscale to ~5K locally
+            </label>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button @click="generate()" :disabled="generating" class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 font-medium flex items-center gap-2">
+            <i class="lucide-wand-2"></i>
+            <span x-text="generating ? 'Generating…' : 'Generate' "></span>
+          </button>
+          <span class="text-xs text-slate-500">Requires serverless key (see setup). Images are returned to your browser; no storage.</span>
+        </div>
+        <template x-if="genResult">
+          <div class="mt-3">
+            <img :src="genResult" alt="AI result" class="w-full rounded-xl shadow"/>
+            <div class="mt-2 flex gap-2">
+              <button @click="downloadDataUrl(genResult, 'ai-wallpaper.png')" class="rounded-xl border px-3 py-2 text-sm">Download</button>
+              <button @click="addToGrid(genResult)" class="rounded-xl border px-3 py-2 text-sm">Add to Grid (local)</button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews/Comments via giscus -->
+  <section class="border-t border-slate-200/60 dark:border-slate-800/60">
+    <div class="mx-auto max-w-5xl px-3 sm:px-6 py-8">
+      <h2 class="text-xl font-semibold mb-2">Reviews & Discussions</h2>
+      <p class="text-sm text-slate-500 mb-4">Comments are powered by GitHub Discussions using <a href="https://giscus.app" target="_blank" class="text-brand-600 underline">giscus</a>. Replace repo details in the script below.</p>
+      <script src="https://giscus.app/client.js"
+        data-repo="YOUR_GITHUB_USERNAME/YOUR_REPO"
+        data-repo-id="REPO_ID"
+        data-category="General"
+        data-category-id="CATEGORY_ID"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous" async>
+      </script>
+      <noscript>Please enable JavaScript to view comments.</noscript>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-200/60 dark:border-slate-800/60">
+    <div class="mx-auto max-w-7xl px-3 sm:px-6 py-6 text-sm text-slate-500 flex flex-wrap items-center gap-2">
+      <span>© <span x-text="new Date().getFullYear()"></span> Ultra HD Wallpapers</span>
+      <span class="mx-2">•</span>
+      <a href="https://github.com/" target="_blank" class="underline">Source</a>
+      <span class="mx-2">•</span>
+      <a href="#" @click.prevent="promptAddToHome()" class="underline">Install App</a>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    // Subtle hero reveal
+    window.addEventListener('load', () => {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.from('h1', { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out' });
+      gsap.utils.toArray('#grid img').forEach((el) => {
+        gsap.from(el, { opacity: 0, duration: 0.4, scrollTrigger: { trigger: el, start: 'top 90%' } });
+      });
+    });
+    // Service worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    }
+  </script>
+</body>
+</html>
