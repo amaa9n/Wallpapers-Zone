@@ -1,40 +1,69 @@
-const appState = {
-  // UI state
-  mobileMenu: false,
-  darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
-  openGenerator: false,
-  generating: false,
-  detailOpen: false,
-  selected: null,
-  q: '',
-  sortBy: 'latest',
-  featuredTags: ['Nature','City','Abstract','Minimal','Space','Landscape','Animals','Cars','Neon','Texture'],
-  activeTags: new Set(),
+const grid = document.getElementById("wallpaperGrid");
+const searchInput = document.getElementById("searchInput");
+const categoryButtons = document.querySelectorAll("#categories button");
+const themeToggle = document.getElementById("themeToggle");
 
-  // Data
-  all: [], // all wallpapers loaded from /data/wallpapers.json
-  page: 0,
-  pageSize: 24,
-  filtered: [],
-  likes: new Set(JSON.parse(localStorage.getItem('likes')||'[]')),
+// Load wallpapers from JSON
+async function loadWallpapers() {
+  const res = await fetch("data/wallpapers.json");
+  const wallpapers = await res.json();
+  displayWallpapers(wallpapers);
 
-  // AI generator state
-  gen: { prompt: '', aspect: '16:9', size: '2048x1152', quality: 'hd', upscale5k: true },
-  genResult: null,
+  // Search filter
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    const filtered = wallpapers.filter(w =>
+      w.title.toLowerCase().includes(query) ||
+      w.tags.some(tag => tag.toLowerCase().includes(query))
+    );
+    displayWallpapers(filtered);
+  });
 
-  async init() {
-    try {
-      const res = await fetch('/data/wallpapers.json');
-      const json = await res.json();
-      this.all = json.sort((a,b)=> new Date(b.added) - new Date(a.added));
-      this.applyFilters();
-      this.observeInfiniteScroll();
-    } catch (e) {
-      console.error('Failed to load wallpapers.json', e);
-    }
-  },
+  // Category filter
+  categoryButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      categoryButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const category = btn.dataset.category;
+      if (category === "all") {
+        displayWallpapers(wallpapers);
+      } else {
+        const filtered = wallpapers.filter(w =>
+          w.tags.includes(category)
+        );
+        displayWallpapers(filtered);
+      }
+    });
+  });
+}
 
-  toggleDark(){ this.darkMode = !this.darkMode; localStorage.setItem('dark', this.darkMode ? '1':'0'); },
+function displayWallpapers(list) {
+  grid.innerHTML = "";
+  list.forEach(w => {
+    const card = document.createElement("div");
+    card.className = "wallpaper-card";
+    card.innerHTML = `
+      <img src="${w.thumb}" alt="${w.title}">
+      <div class="wallpaper-info">
+        <h3>${w.title}</h3>
+        <a class="download-btn" href="${w.src}" download>Download</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Theme toggle
+themeToggle.addEventListener("click", () => {
+  document.body.dataset.theme =
+    document.body.dataset.theme === "dark" ? "light" : "dark";
+  themeToggle.textContent =
+    document.body.dataset.theme === "dark" ? "☀️" : "🌙";
+});
+
+// Initialize
+document.body.dataset.theme = "light";
+loadWallpapers();  toggleDark(){ this.darkMode = !this.darkMode; localStorage.setItem('dark', this.darkMode ? '1':'0'); },
   scrollToTop(){ window.scrollTo({top:0, behavior:'smooth'}); },
 
   toggleTag(tag){
