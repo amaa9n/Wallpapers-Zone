@@ -1,1 +1,7 @@
-
+/* Smooth scroll & image polish */
+html { scroll-behavior: smooth; }
+img { image-rendering: auto; }
+/* Masonry fix: add gaps */
+#grid > article { break-inside: avoid; margin-bottom: 1rem; }
+/* Hide focus ring outlines only when using a mouse */
+:focus:not(:focus-visible) { outline: none; }
