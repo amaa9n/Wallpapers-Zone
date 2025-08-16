@@ -5,11 +5,11 @@ const boards = [
     },
     {
         name: "Nature Wallpapers",
-        rssFeedUrl: "YOUR_NATURE_BOARD_RSS_FEED_URL"
+        rssFeedUrl: "https://pin.it/4uKgEk8JT"
     },
     {
         name: "Abstract Wallpapers",
-        rssFeedUrl: "YOUR_ABSTRACT_BOARD_RSS_FEED_URL"
+        rssFeedUrl: "https://pin.it/6AnI6TYhp"
     }
 ];
 
