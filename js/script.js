@@ -1,7 +1,7 @@
 const boards = [
     {
         name: "Neon Wallpapers",
-        rssFeedUrl: "https://pingen.org/feed/1234567890" // Replace with your board URL
+        rssFeedUrl: "https://pin.it/5XeEx0B0v" // Replace with your board URL
     },
     {
         name: "Nature Wallpapers",
