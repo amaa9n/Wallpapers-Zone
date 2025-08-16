@@ -1,39 +1,86 @@
 const boards = [
-    {
-        name: "Neon Wallpapers",
-        rssFeedUrl: "https://pin.it/5XeEx0B0v" // Replace with your board URL
-    },
-    {
-        name: "Nature Wallpapers",
-        rssFeedUrl: "https://pin.it/4uKgEk8JT"
-    },
-    {
-        name: "Abstract Wallpapers",
-        rssFeedUrl: "https://pin.it/6AnI6TYhp"
-    }
+  {
+    name: "Scenery Wallpaper",
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/scenery-wallpaper/.rss"
+  },
+  {
+    name: "Depth Wallpaper",
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/depth-wallpaper/.rss"
+  },
+  {
+    name: "Photography",
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/photography/.rss"
+  },
+  {
+    name: "Dark Phone Wallpapers",
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/dark-phone-wallpapers/.rss"
+  }
 ];
 
-const gallery = document.getElementById('gallery');
-const searchInput = document.getElementById('searchInput');
-const loader = document.getElementById('loading');
-const scrollLoader = document.getElementById('loading-scroll');
-const filterButtons = document.querySelectorAll('.filter-btn');
+const boardList = document.getElementById("boardList");
+const gallery = document.getElementById("gallery");
 
-let allPins = [];
-let currentPage = 0;
-const pinsPerPage = 12;
+// Render board buttons and setup click handlers
+function renderBoards() {
+  boardList.innerHTML = "";
+  boards.forEach((board, idx) => {
+    const btn = document.createElement("button");
+    btn.classList.add("board-tab");
+    if (idx === 0) btn.classList.add("active");
+    btn.textContent = board.name;
+    btn.addEventListener("click", () => selectBoard(idx));
+    boardList.appendChild(btn);
+  });
+}
 
-async function fetchAndRenderPins() {
-    loader.classList.remove('hidden');
-    allPins = [];
+// Load and render pins from selected board RSS feed (converted via rss2json public API)
+async function selectBoard(index) {
+  // Highlight active tab
+  document.querySelectorAll(".board-tab").forEach((btn, idx) => {
+    btn.classList.toggle("active", idx === index);
+  });
 
-    for (const board of boards) {
-        try {
-            const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(board.rssFeedUrl)}`);
-            const data = await response.json();
-            const pinsForBoard = data.items.filter(item => item.enclosure && item.enclosure.link);
-            
-            if (pinsForBoard.length > 0) {
+  gallery.innerHTML = `<p style="text-align:center; color:#666; font-size:1.2rem;">Loading wallpapers...</p>`;
+
+  const rssUrl = boards[index].rssFeedUrl;
+
+  const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+  try {
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    if (data.status !== "ok") throw new Error("Failed to load RSS feed");
+    renderGallery(data.items);
+  } catch (err) {
+    gallery.innerHTML = `<p style="color:#f55; text-align:center;">Failed to load wallpapers. Try again later.</p>`;
+    console.error(err);
+  }
+}
+
+function renderGallery(items) {
+  gallery.innerHTML = "";
+  items.forEach(item => {
+    if (!item.enclosure || !item.enclosure.link) return;
+
+    const card = document.createElement("div");
+    card.className = "wallpaper-card";
+
+    card.innerHTML = `
+      <a href="${item.link}" target="_blank" rel="noopener noreferrer">
+        <img src="${item.enclosure.link}" alt="${item.title}" loading="lazy" />
+      </a>
+      <div class="card-info">
+        <h3 title="${item.title}">${item.title}</h3>
+      </div>
+    `;
+
+    gallery.appendChild(card);
+  });
+}
+
+// Initialize
+renderBoards();
+selectBoard(0);
                 pinsForBoard.forEach(pin => pin.boardName = board.name);
                 allPins = allPins.concat(pinsForBoard);
             }
