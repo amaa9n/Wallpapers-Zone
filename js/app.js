@@ -1,4 +1,4 @@
-// Replace with your Pinterest board RSS feed
+
 const rssFeed = 'https://pin.it/760Lb4hoY.rss';
 
 const gallery = document.getElementById('gallery');
