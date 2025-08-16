@@ -1,209 +1,47 @@
-const grid = document.getElementById("wallpaperGrid");
-const searchInput = document.getElementById("searchInput");
-const categoryButtons = document.querySelectorAll("#categories button");
-const themeToggle = document.getElementById("themeToggle");
+// Replace with your Pinterest board RSS feed
+const rssFeed = 'https://pin.it/760Lb4hoY.rss';
 
-// Load wallpapers from JSON
-async function loadWallpapers() {
-  const res = await fetch("data/wallpapers.json");
-  const wallpapers = await res.json();
-  displayWallpapers(wallpapers);
+const gallery = document.getElementById('gallery');
+const searchInput = document.getElementById('searchInput');
 
-  // Search filter
-  searchInput.addEventListener("input", () => {
-    const query = searchInput.value.toLowerCase();
-    const filtered = wallpapers.filter(w =>
-      w.title.toLowerCase().includes(query) ||
-      w.tags.some(tag => tag.toLowerCase().includes(query))
-    );
-    displayWallpapers(filtered);
-  });
+let wallpapers = [];
 
-  // Category filter
-  categoryButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      categoryButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const category = btn.dataset.category;
-      if (category === "all") {
-        displayWallpapers(wallpapers);
-      } else {
-        const filtered = wallpapers.filter(w =>
-          w.tags.includes(category)
-        );
-        displayWallpapers(filtered);
-      }
+// Fetch RSS feed using rss2json API
+fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeed)}`)
+  .then(res => res.json())
+  .then(data => {
+    wallpapers = data.items.map(item => {
+      const parser = new DOMParser();
+      const htmlDoc = parser.parseFromString(item.content, "text/html");
+      const img = htmlDoc.querySelector('img');
+      return {
+        img: img ? img.src : '',
+        title: item.title
+      };
     });
-  });
-}
+    displayWallpapers(wallpapers);
+  })
+  .catch(err => console.error('Failed to fetch RSS:', err));
 
+// Display wallpapers in gallery
 function displayWallpapers(list) {
-  grid.innerHTML = "";
-  list.forEach(w => {
-    const card = document.createElement("div");
-    card.className = "wallpaper-card";
-    card.innerHTML = `
-      <img src="${w.thumb}" alt="${w.title}">
-      <div class="wallpaper-info">
-        <h3>${w.title}</h3>
-        <a class="download-btn" href="${w.src}" download>Download</a>
-      </div>
-    `;
-    grid.appendChild(card);
+  gallery.innerHTML = '';
+  list.forEach(wp => {
+    if (wp.img) {
+      const div = document.createElement('div');
+      div.className = 'wallpaper';
+      div.innerHTML = `
+        <img src="${wp.img}" alt="${wp.title}">
+        <div class="caption">${wp.title}</div>
+      `;
+      gallery.appendChild(div);
+    }
   });
 }
 
-// Theme toggle
-themeToggle.addEventListener("click", () => {
-  document.body.dataset.theme =
-    document.body.dataset.theme === "dark" ? "light" : "dark";
-  themeToggle.textContent =
-    document.body.dataset.theme === "dark" ? "☀️" : "🌙";
+// Search wallpapers by caption
+searchInput.addEventListener('input', () => {
+  const term = searchInput.value.toLowerCase();
+  const filtered = wallpapers.filter(wp => wp.title.toLowerCase().includes(term));
+  displayWallpapers(filtered);
 });
-
-// Initialize
-document.body.dataset.theme = "light";
-loadWallpapers();  toggleDark(){ this.darkMode = !this.darkMode; localStorage.setItem('dark', this.darkMode ? '1':'0'); },
-  scrollToTop(){ window.scrollTo({top:0, behavior:'smooth'}); },
-
-  toggleTag(tag){
-    if(this.activeTags.has(tag)) this.activeTags.delete(tag); else this.activeTags.add(tag);
-    this.applyFilters(true);
-  },
-
-  search(){ this.applyFilters(true); },
-
-  applySort(){ this.applyFilters(true); },
-
-  applyFilters(resetPage=false){
-    const q = this.q.trim().toLowerCase();
-    const tags = Array.from(this.activeTags);
-    let arr = this.all.filter(w=>{
-      const matchQ = !q || w.title.toLowerCase().includes(q) || (w.tags||[]).some(t=>t.toLowerCase().includes(q));
-      const matchTags = tags.length===0 || tags.every(t => (w.tags||[]).includes(t));
-      return matchQ && matchTags;
-    });
-    if(this.sortBy==='popular') arr.sort((a,b)=>(this.isLiked(b.id)-this.isLiked(a.id))||0);
-    if(this.sortBy==='trending') arr.sort((a,b)=>(b.downloads||0)-(a.downloads||0));
-    if(resetPage){ this.page=0; document.getElementById('grid').innerHTML=''; }
-    this.filtered = arr;
-    this.renderNextPage();
-  },
-
-  observeInfiniteScroll(){
-    const sentinel = document.getElementById('sentinel');
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{ if(entry.isIntersecting) this.renderNextPage(); });
-    }, { rootMargin: '800px' });
-    io.observe(sentinel);
-  },
-
-  renderNextPage(){
-    const start = this.page * this.pageSize;
-    const slice = this.filtered.slice(start, start + this.pageSize);
-    if(slice.length===0) return;
-    const grid = document.getElementById('grid');
-    slice.forEach(w => grid.appendChild(this.card(w)));
-    this.page++;
-  },
-
-  card(w){
-    const art = document.createElement('article');
-    art.className = 'group relative overflow-hidden rounded-2xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-800/50 shadow hover:shadow-lg transition-shadow';
-    art.innerHTML = `
-      <img src="${w.thumb||w.src}" alt="${w.title}" loading="lazy" class="w-full h-auto max-h-[60rem] object-cover">
-      <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/60 via-black/20 to-transparent text-white">
-        <div class="flex items-center justify-between">
-          <h3 class="text-sm font-semibold line-clamp-1">${w.title}</h3>
-          <button class="rounded-full bg-white/90 text-slate-900 px-2 py-1 text-xs flex items-center gap-1 like-btn"><i class="lucide-heart"></i><span>${this.isLiked(w.id)?'Liked':'Like'}</span></button>
-        </div>
-      </div>`;
-    art.querySelector('img').addEventListener('click', ()=>{ this.selected = w; this.detailOpen = true; });
-    art.querySelector('.like-btn').addEventListener('click', (e)=>{ e.stopPropagation(); this.toggleLike(w); art.querySelector('.like-btn span').textContent = this.isLiked(w.id)?'Liked':'Like'; });
-    return art;
-  },
-
-  isLiked(id){ return this.likes.has(id); },
-  likeLabel(w){ return this.isLiked(w.id)?'Liked':'Like'; },
-  toggleLike(w){
-    if(this.likes.has(w.id)) this.likes.delete(w.id); else this.likes.add(w.id);
-    localStorage.setItem('likes', JSON.stringify(Array.from(this.likes)));
-  },
-
-  closeDetail(){ this.detailOpen=false; this.selected=null; },
-  formatDate(d){ return d ? dayjs(d).format('MMM D, YYYY') : ''; },
-
-  async download(w){
-    try {
-      // Attempt CORS-friendly fetch → blob → save
-      const a = document.createElement('a');
-      const resp = await fetch(w.src, { mode: 'cors' });
-      const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
-      a.href = url; a.download = (w.title||'wallpaper').replace(/[^a-z0-9-_]+/gi,'_') + '.jpg';
-      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    } catch(e) {
-      // Fallback: open in new tab (some hosts block CORS download)
-      window.open(w.src, '_blank');
-    }
-  },
-
-  copy(text){ navigator.clipboard.writeText(text).then(()=>alert('Link copied')); },
-  giscusLink(w){ return location.origin + location.pathname + '#reviews'; },
-
-  // AI generation
-  async generate(){
-    if(!this.gen.prompt.trim()) { alert('Write a good prompt first 🙂'); return; }
-    this.generating = true; this.genResult = null;
-    try {
-      const r = await fetch('/.netlify/functions/generate-image', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: this.gen.prompt, size: this.gen.size, quality: this.gen.quality, aspect: this.gen.aspect })
-      });
-      const { dataUrl } = await r.json();
-      let out = dataUrl;
-      if(this.gen.upscale5k){ out = await upscaleCanvas(out, 2); }
-      this.genResult = out;
-    } catch(e){ console.error(e); alert('Generation failed. Check your serverless function & API key.'); }
-    finally { this.generating = false; }
-  },
-
-  downloadDataUrl(dataUrl, filename){
-    const a = document.createElement('a');
-    a.href = dataUrl; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-  },
-
-  addToGrid(url){
-    // Add a temporary local item (not saved to JSON)
-    const id = 'local-'+Date.now();
-    const w = { id, title: 'AI Wallpaper', src: url, thumb: url, tags:['AI'], added: new Date().toISOString(), resolution: 'generated' };
-    this.filtered.unshift(w); this.page=0; document.getElementById('grid').innerHTML=''; this.renderNextPage();
-    this.openGenerator=false; this.detailOpen=false;
-  },
-
-  promptAddToHome(){ alert('Use your browser menu → Add to Home Screen to install the PWA.'); }
-};
-
-// Expose app state
-window.appState = appState;
-
-document.addEventListener('alpine:init', () => {
-  Alpine.data('appState', () => ({ ...appState, init: appState.init }));
-});
-
-// Simple client-side upscale using Canvas (2× default)
-async function upscaleCanvas(dataUrl, scale=2){
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = img.width * scale; c.height = img.height * scale;
-      const ctx = c.getContext('2d');
-      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, c.width, c.height);
-      resolve(c.toDataURL('image/png'));
-    };
-    img.crossOrigin = 'anonymous';
-    img.src = dataUrl;
-  });
-  }
