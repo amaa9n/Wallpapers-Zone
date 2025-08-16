@@ -1,39 +1,21 @@
 const boards = [
   {
     name: "Scenery Wallpaper",
-    rssFeedUrl: "https://in.pinterest.com/amaa9n/scenery-wallpaper/.rss"
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/scenery-wallpaper.rss"
   },
   {
     name: "Depth Wallpaper",
-    rssFeedUrl: "https://in.pinterest.com/amaa9n/depth-wallpaper/.rss"
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/depth-wallpaper.rss"
   },
   {
     name: "Photography",
-    rssFeedUrl: "https://in.pinterest.com/amaa9n/photography/.rss"
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/photography.rss"
   },
   {
     name: "Dark Phone Wallpapers",
-    rssFeedUrl: "https://in.pinterest.com/amaa9n/dark-phone-wallpapers/.rss"
+    rssFeedUrl: "https://in.pinterest.com/amaa9n/dark-phone-wallpapers.rss"
   }
 ];
-
-const boardList = document.getElementById("boardList");
-const gallery = document.getElementById("gallery");
-
-// Render board buttons and setup click handlers
-function renderBoards() {
-  boardList.innerHTML = "";
-  boards.forEach((board, idx) => {
-    const btn = document.createElement("button");
-    btn.classList.add("board-tab");
-    if (idx === 0) btn.classList.add("active");
-    btn.textContent = board.name;
-    btn.addEventListener("click", () => selectBoard(idx));
-    boardList.appendChild(btn);
-  });
-}
-
-// Load and render pins from selected board RSS feed (converted via rss2json public API)
 async function selectBoard(index) {
   // Highlight active tab
   document.querySelectorAll(".board-tab").forEach((btn, idx) => {
