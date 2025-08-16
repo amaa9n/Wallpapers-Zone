@@ -1,39 +1,102 @@
 :root {
-    --bg-color: #f0f2f5;
-    --text-color: #333;
-    --card-bg: #fff;
-    --header-bg: #fff;
-    --search-bg: #f5f5f5;
-    --accent-color: #007BFF;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --bg-gradient: linear-gradient(120deg, #151b26 0%, #101214 100%);
+  --accent: #1966ff;
+  --glass: rgba(30, 33, 45, 0.65);
+  --border-radius: 24px;
+  --text-color: #fff;
+  --text-color-muted: #aaa;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  min-height: 100vh;
 }
 
 .header {
-    background-color: var(--header-bg);
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+  background: var(--glass);
+  padding: 1.5rem 2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: -0.05em;
+  box-shadow: 0 2px 20px rgba(25, 102, 255, 0.3);
 }
 
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 50px;
-    max-width: 1200px;
-    margin: 0 auto;
+.board-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem;
 }
 
+.board-tab {
+  cursor: pointer;
+  background: var(--glass);
+  border: 1px solid var(--accent);
+  border-radius: var(--border-radius);
+  color: var(--accent);
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+
+.board-tab.active, .board-tab:hover {
+  background: var(--accent);
+  color: var(--text-color);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 2rem 3rem;
+}
+
+.wallpaper-card {
+  background: var(--glass);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(25, 102, 255, 0.35);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.wallpaper-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(25, 102, 255, 0.6);
+}
+
+.wallpaper-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.card-info {
+  padding: 0.75rem 1rem;
+}
+
+.card-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.card-info p {
+  margin: 0.3rem 0 0;
+  color: var(--text-color-muted);
+  font-size: 0.9rem;
+}
 .logo {
     font-size: 2em;
     font-weight: 500;
