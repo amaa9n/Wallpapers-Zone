@@ -1,39 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallpapers Zone</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wallpapers Zone</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <h1 class="logo">Wallpapers Zone</h1>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search wallpapers..." class="search-bar">
-                <button class="search-btn">
-                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                </button>
-            </div>
-        </div>
-    </header>
+  <header class="header">
+    <h1 class="logo">Wallpapers Zone</h1>
+  </header>
 
-    <div class="controls">
-        <div class="filter-options">
-            <p>Filter by:</p>
-            <button class="filter-btn active" data-sort="latest">Latest</button>
-            <button class="filter-btn" data-sort="most-viewed">Most Viewed</button>
-        </div>
-    </div>
-    
-    <main class="main-content">
-        <div id="loading" class="loader-container">
-            <div class="loader"></div>
-            <p class="loading-message">Loading wallpapers...</p>
-        </div>
-        
+  <nav class="board-list" id="boardList"></nav>
+  <main class="gallery" id="gallery"></main>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
         <div id="gallery" class="gallery-grid">
             </div>
 
