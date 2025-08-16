@@ -1,133 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wallpapers Zone</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script defer src="js/script.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallpapers Zone</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
-    <h1>Wallpapers Zone</h1>
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Search wallpapers..." />
-    </div>
-    <button id="themeToggle">🌙</button>
-  </header>
+<header>
+  <h1>Wallpapers Zone</h1>
+  <input type="text" id="searchInput" placeholder="Search wallpapers...">
+</header>
+<main id="gallery"></main>
 
-  <nav id="categories">
-    <button data-category="all" class="active">All</button>
-    <button data-category="nature">Nature</button>
-    <button data-category="cars">Cars</button>
-    <button data-category="abstract">Abstract</button>
-    <button data-category="animals">Animals</button>
-  </nav>
-
-  <main id="wallpaperGrid"></main>
-
-  <footer>
-    <p>© 2025 Wallpapers Zone</p>
-  </footer>
-</body>
-</html>der-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2"></textarea>
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <label class="flex flex-col">
-              <span class="text-slate-500">Aspect</span>
-              <select x-model="gen.aspect" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2">
-                <option value="1:1">1:1</option>
-                <option value="16:9" selected>16:9</option>
-                <option value="9:16">9:16</option>
-                <option value="21:9">21:9</option>
-              </select>
-            </label>
-            <label class="flex flex-col">
-              <span class="text-slate-500">Quality</span>
-              <select x-model="gen.quality" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2">
-                <option value="standard">Standard</option>
-                <option value="hd" selected>HD</option>
-              </select>
-            </label>
-            <label class="flex flex-col">
-              <span class="text-slate-500">Base Size</span>
-              <select x-model="gen.size" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 px-3 py-2">
-                <option value="1024x1024">1024×1024</option>
-                <option value="2048x1152" selected>2048×1152</option>
-                <option value="2048x2048">2048×2048</option>
-              </select>
-            </label>
-            <label class="flex items-center gap-2 mt-6">
-              <input type="checkbox" x-model="gen.upscale5k" class="rounded"> Upscale to ~5K locally
-            </label>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button @click="generate()" :disabled="generating" class="rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 font-medium flex items-center gap-2">
-            <i class="lucide-wand-2"></i>
-            <span x-text="generating ? 'Generating…' : 'Generate' "></span>
-          </button>
-          <span class="text-xs text-slate-500">Requires serverless key (see setup). Images are returned to your browser; no storage.</span>
-        </div>
-        <template x-if="genResult">
-          <div class="mt-3">
-            <img :src="genResult" alt="AI result" class="w-full rounded-xl shadow"/>
-            <div class="mt-2 flex gap-2">
-              <button @click="downloadDataUrl(genResult, 'ai-wallpaper.png')" class="rounded-xl border px-3 py-2 text-sm">Download</button>
-              <button @click="addToGrid(genResult)" class="rounded-xl border px-3 py-2 text-sm">Add to Grid (local)</button>
-            </div>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
-
-  <!-- Reviews/Comments via giscus -->
-  <section class="border-t border-slate-200/60 dark:border-slate-800/60">
-    <div class="mx-auto max-w-5xl px-3 sm:px-6 py-8">
-      <h2 class="text-xl font-semibold mb-2">Reviews & Discussions</h2>
-      <p class="text-sm text-slate-500 mb-4">Comments are powered by GitHub Discussions using <a href="https://giscus.app" target="_blank" class="text-brand-600 underline">giscus</a>. Replace repo details in the script below.</p>
-      <script src="https://giscus.app/client.js"
-        data-repo="YOUR_GITHUB_USERNAME/YOUR_REPO"
-        data-repo-id="REPO_ID"
-        data-category="General"
-        data-category-id="CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        crossorigin="anonymous" async>
-      </script>
-      <noscript>Please enable JavaScript to view comments.</noscript>
-    </div>
-  </section>
-
-  <footer class="border-t border-slate-200/60 dark:border-slate-800/60">
-    <div class="mx-auto max-w-7xl px-3 sm:px-6 py-6 text-sm text-slate-500 flex flex-wrap items-center gap-2">
-      <span>© <span x-text="new Date().getFullYear()"></span> Ultra HD Wallpapers</span>
-      <span class="mx-2">•</span>
-      <a href="https://github.com/" target="_blank" class="underline">Source</a>
-      <span class="mx-2">•</span>
-      <a href="#" @click.prevent="promptAddToHome()" class="underline">Install App</a>
-    </div>
-  </footer>
-
-  <script src="/js/app.js"></script>
-  <script>
-    // Subtle hero reveal
-    window.addEventListener('load', () => {
-      gsap.registerPlugin(ScrollTrigger);
-      gsap.from('h1', { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out' });
-      gsap.utils.toArray('#grid img').forEach((el) => {
-        gsap.from(el, { opacity: 0, duration: 0.4, scrollTrigger: { trigger: el, start: 'top 90%' } });
-      });
-    });
-    // Service worker for PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(()=>{});
-    }
-  </script>
+<script src="js/script.js"></script>
 </body>
 </html>
