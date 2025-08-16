@@ -1,40 +1,59 @@
-:root {
-  --bg-color: #ffffff;
-  --text-color: #222;
-  --card-bg: #f4f4f4;
-}
-
-[data-theme="dark"] {
-  --bg-color: #1a1a1a;
-  --text-color: #f4f4f4;
-  --card-bg: #2a2a2a;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
+  margin: 0;
   font-family: sans-serif;
-  background: var(--bg-color);
-  color: var(--text-color);
-  transition: all 0.3s ease;
+  background: #111;
+  color: #fff;
 }
 
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: var(--card-bg);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  background: #222;
+  padding: 15px;
+  text-align: center;
+  z-index: 100;
 }
 
-header h1 {
+header input {
+  padding: 10px;
+  width: 80%;
+  max-width: 400px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+}
+
+#gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 10px;
+  gap: 10px;
+}
+
+.wallpaper {
+  width: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s;
+  background: #222;
+}
+
+.wallpaper img {
+  width: 100%;
+  display: block;
+}
+
+.wallpaper:hover {
+  transform: scale(1.05);
+}
+
+.caption {
+  text-align: center;
+  padding: 5px;
+  font-size: 14px;
+}header h1 {
   font-size: 1.5rem;
 }
 
